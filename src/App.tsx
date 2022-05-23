@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import Circle from "./Circle";
+
 const Container = styled.div`
-  background-color: ${(props) => props.theme.bgColor};
-  color: white;
+  background-color: ${(props) => props.theme.bgColor ?? "gray"};
+
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -19,7 +19,7 @@ const Title = styled.h1`
 export default function App() {
   return (
     <Container>
-      <Circle bgColor="red" />
+      <Title>Hello</Title>
     </Container>
   );
 }
