@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
-const Title = styled.h1`
-  font-family: ohm-bold;
-  font-weight: 700;
-  font-size: 60px;
-  text-align: center;
-  margin: 20px;
-  color: ${(props) => props.theme.accentColor};
-`;
+//styled components
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -17,8 +10,18 @@ const Container = styled.div`
 const Header = styled.div`
   margin: 10px 0px;
 `;
+const Title = styled.h1`
+  font-family: ohm-bold;
+  font-weight: 700;
+  font-size: 60px;
+  text-align: center;
+  margin: 20px;
+  color: ${(props) => props.theme.accentColor};
+`;
 const CoinList = styled.ul``;
+
 const Coin = styled.li`
+  min-width: 150px;
   background-color: ${(props) => props.theme.color};
   color: ${(props) => props.theme.bgColor};
   padding: 10px;
@@ -50,7 +53,6 @@ const Loading = styled.div`
   height: 100px;
   border-radius: 50%;
   border: 2px solid ${(props) => props.theme.accentColor};
-
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   animation: ${rotate} 1s linear infinite;
@@ -60,6 +62,8 @@ const Img = styled.img`
   width: 2em;
   height: 2em;
 `;
+
+//interfaces
 interface CoinsI {
   id: string;
   name: string;
@@ -70,10 +74,10 @@ interface CoinsI {
   type: string;
 }
 
+// react component
 export default function Coins() {
   const [coins, setCoins] = useState<CoinsI[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     (async () => {
@@ -89,21 +93,24 @@ export default function Coins() {
       <Header>
         <Title>Coins</Title>
       </Header>
+
       {loading ? (
         <Loading />
       ) : (
         <CoinList className="hello">
-          {coins.map((coin) => (
-            <Coin key={coin.id}>
-              <Link to={`/${coin.id}`}>
-                <span>{coin.name} </span>
-                <Img
-                  alt={coin.symbol}
-                  src={`https://coinicons-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`}
-                />
-              </Link>
-            </Coin>
-          ))}
+          {coins.map(function (coin) {
+            return (
+              <Coin key={coin.id}>
+                <Link to={`/${coin.id}`} state={{ name: coin.name }}>
+                  <span>{coin.name} </span>
+                  <Img
+                    alt={coin.symbol}
+                    src={`https://coinicons-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`}
+                  />
+                </Link>
+              </Coin>
+            );
+          })}
         </CoinList>
       )}
     </Container>
