@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
+import Chart from "./routes/Chart";
 import Coin from "./routes/Coin";
 import Coins from "./routes/Coins";
+import Supply from "./routes/Supply";
 import { theme } from "./theme";
 const ResetCss = createGlobalStyle`
     html, body, div, span, applet, object, iframe,
@@ -71,7 +73,10 @@ function Router() {
         <ResetCss />
         <Routes>
           <Route path="/" element={<Coins />} />
-          <Route path=":coinId" element={<Coin />} />
+          <Route path=":coinId" element={<Coin />}>
+            <Route path="supply" element={<Supply />} />
+            <Route path="chart" element={<Chart />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
