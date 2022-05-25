@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import Chart from "./routes/Chart";
@@ -5,6 +6,8 @@ import Coin from "./routes/Coin";
 import Coins from "./routes/Coins";
 import Supply from "./routes/Supply";
 import { theme } from "./theme";
+
+// styled-components
 const ResetCss = createGlobalStyle`
     html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -66,19 +69,24 @@ a{
 
 
 `;
+
+const queryClient = new QueryClient();
+
 function Router() {
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <ResetCss />
-        <Routes>
-          <Route path="/" element={<Coins />} />
-          <Route path=":coinId" element={<Coin />}>
-            <Route path="supply" element={<Supply />} />
-            <Route path="chart" element={<Chart />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ResetCss />
+          <Routes>
+            <Route path="/" element={<Coins />} />
+            <Route path=":coinId" element={<Coin />}>
+              <Route path="supply" element={<Supply />} />
+              <Route path="chart" element={<Chart />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

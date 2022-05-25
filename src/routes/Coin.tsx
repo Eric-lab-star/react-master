@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  useParams,
-  useLocation,
-  Link,
-  Outlet,
-  NavLink,
-} from "react-router-dom";
+import { useQuery } from "react-query";
+
+import { useParams, useLocation, Outlet, NavLink } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
 // styled-components
@@ -55,10 +51,9 @@ const InfoContainer = styled.div`
   margin: 3px 0px;
   & a {
     min-width: fit-content;
-  }
-  & a.activeTab {
-    font-size: 20px;
-    color: ${(props) => props.theme.accentColor};
+    &.activeTab {
+      color: ${(props) => props.theme.accentColor};
+    }
   }
 `;
 
@@ -80,7 +75,6 @@ const Description = styled.p`
   text-align: start;
   word-break: break-all;
 `;
-
 //interface
 
 interface RouteState {
@@ -158,6 +152,12 @@ export default function Coin() {
   const [loader, setLoader] = useState(true);
   const [info, setInfo] = useState<CoinInfo>();
   const [priceInfo, setPriceInfo] = useState<PriceInfo>();
+  const { isLoading, error, data } = useQuery("coinsData", () =>
+    fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`).then((res) =>
+      res.json()
+    )
+  );
+  console.log(data);
   useEffect(() => {
     (async () => {
       const infoData = await (
@@ -176,7 +176,7 @@ export default function Coin() {
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loader ? "Laoding" : info?.name}{" "}
+          {state?.name ? state.name : loader ? "Loading" : info?.name}
         </Title>
       </Header>
       {loader ? (
