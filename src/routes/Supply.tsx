@@ -1,3 +1,7 @@
+import { useCoinId } from "./Coin";
+
 export default function Supply() {
-  return <div>Supply</div>;
+  const { coinId } = useCoinId();
+
+  return <div>{coinId}: Supply</div>;
 }

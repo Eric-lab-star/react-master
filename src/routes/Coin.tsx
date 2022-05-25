@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 
-import { useParams, useLocation, Outlet, NavLink } from "react-router-dom";
+import {
+  useParams,
+  useLocation,
+  Outlet,
+  NavLink,
+  useOutletContext,
+} from "react-router-dom";
 import styled, { keyframes } from "styled-components";
+import { CoinInfoAPI, CoinPriceInfoAPI } from "../api";
 
 // styled-components
 const Container = styled.div`
@@ -146,58 +153,53 @@ interface PriceInfo {
 }
 
 export default function Coin() {
-  const location = useLocation();
-  const state = location.state as RouteState;
+  const state = useLocation().state as RouteState;
+
   const { coinId } = useParams();
-  const [loader, setLoader] = useState(true);
-  const [info, setInfo] = useState<CoinInfo>();
-  const [priceInfo, setPriceInfo] = useState<PriceInfo>();
-  const { isLoading, error, data } = useQuery("coinsData", () =>
-    fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`).then((res) =>
-      res.json()
-    )
+
+  const { data: priceInfo } = useQuery<PriceInfo>(
+    ["coin", coinId],
+    () => CoinPriceInfoAPI(coinId),
+    {
+      cacheTime: 3000,
+    }
   );
-  console.log(data);
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceInfo = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPriceInfo(priceInfo);
-      setLoader(false);
-    })();
-  }, [coinId]);
+  const { isLoading: isLoadingInfo, data: coinInfoData } = useQuery<CoinInfo>(
+    ["info", coinId],
+    () => CoinInfoAPI(coinId),
+    { cacheTime: 3000 }
+  );
 
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loader ? "Loading" : info?.name}
+          {state?.name
+            ? state.name
+            : isLoadingInfo
+            ? "Loading"
+            : coinInfoData?.name}
         </Title>
       </Header>
-      {loader ? (
+      {isLoadingInfo ? (
         <Loading />
       ) : (
         <>
           <InfoContainer>
             <Infos>
               <span>RANK:</span>
-              <span>{info?.rank}</span>
+              <span>{coinInfoData?.rank}</span>
             </Infos>
             <Infos>
               <span>SYMBOL:</span>
-              <span>{info?.symbol}</span>
+              <span>{coinInfoData?.symbol}</span>
             </Infos>
             <Infos>
               <span>OPEN SOURCE:</span>
-              <span>{info?.open_source ? "YES" : "NO"}</span>
+              <span>{coinInfoData?.open_source ? "YES" : "NO"}</span>
             </Infos>
           </InfoContainer>
-          <Description>{info?.description}</Description>
+          <Description>{coinInfoData?.description}</Description>
           <InfoContainer>
             <Infos>
               <span>TOTAL SUPPLY</span>
@@ -225,7 +227,13 @@ export default function Coin() {
           </InfoContainer>
         </>
       )}
-      <Outlet />
+      <Outlet context={{ coinId }} />
     </Container>
   );
+}
+interface ICoinId {
+  coinId: string | null;
+}
+export function useCoinId() {
+  return useOutletContext<ICoinId>();
 }

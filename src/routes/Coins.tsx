@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
+import { CoinsAPI } from "../api";
+
 //styled components
 const Container = styled.div`
   display: flex;
@@ -40,12 +43,12 @@ const Coin = styled.li`
   }
 `;
 const rotate = keyframes`
-    from {
-        transform: rotate(0deg);
-    }
-    to{
-        transform:rotate(360deg);
-    }
+  from {
+      transform: rotate(0deg);
+  }
+  to{
+      transform:rotate(360deg);
+  }
 `;
 
 const Loading = styled.div`
@@ -76,17 +79,7 @@ interface CoinsI {
 
 // react component
 export default function Coins() {
-  const [coins, setCoins] = useState<CoinsI[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const response = await fetch("https://api.coinpaprika.com/v1/coins?");
-      const json = await response.json();
-      setCoins(json.slice(0, 100));
-      setLoading(false);
-    })();
-  }, []);
+  const { isLoading, data } = useQuery<CoinsI[]>("coinsData", CoinsAPI);
 
   return (
     <Container>
@@ -94,11 +87,11 @@ export default function Coins() {
         <Title>Coins</Title>
       </Header>
 
-      {loading ? (
+      {isLoading ? (
         <Loading />
       ) : (
-        <CoinList className="hello">
-          {coins.map(function (coin) {
+        <CoinList>
+          {data?.slice(0, 100).map(function (coin) {
             return (
               <Coin key={coin.id}>
                 <Link to={`/${coin.id}`} state={{ name: coin.name }}>

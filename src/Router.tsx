@@ -6,7 +6,7 @@ import Coin from "./routes/Coin";
 import Coins from "./routes/Coins";
 import Supply from "./routes/Supply";
 import { theme } from "./theme";
-
+import { ReactQueryDevtools } from "react-query/devtools";
 // styled-components
 const ResetCss = createGlobalStyle`
     html, body, div, span, applet, object, iframe,
@@ -76,6 +76,7 @@ function Router() {
   return (
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
         <BrowserRouter>
           <ResetCss />
           <Routes>
