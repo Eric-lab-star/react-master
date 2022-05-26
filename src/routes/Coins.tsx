@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
+import { Helmet } from "react-helmet";
 import { CoinsAPI } from "../api";
 
 //styled components
@@ -83,6 +83,9 @@ export default function Coins() {
 
   return (
     <Container>
+      <Helmet>
+        <title>Coins</title>
+      </Helmet>
       <Header>
         <Title>Coins</Title>
       </Header>

@@ -1,17 +1,28 @@
-import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
-
+import { Helmet } from "react-helmet";
 import {
   useParams,
   useLocation,
   Outlet,
   NavLink,
+  Link,
   useOutletContext,
 } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { CoinInfoAPI, CoinPriceInfoAPI } from "../api";
 
 // styled-components
+
+const BTN = styled.button`
+  border-style: none;
+  background-color: ${(props) => props.theme.color};
+  color: ${(props) => props.theme.bgColor};
+  border-radius: 4px;
+  margin: 3px;
+  width: 220px;
+  display: flex;
+  justify-content: center;
+`;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -172,6 +183,15 @@ export default function Coin() {
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name
+            ? state.name
+            : isLoadingInfo
+            ? "Loading"
+            : coinInfoData?.name}
+        </title>
+      </Helmet>
       <Header>
         <Title>
           {state?.name
@@ -181,6 +201,9 @@ export default function Coin() {
             : coinInfoData?.name}
         </Title>
       </Header>
+      <BTN>
+        <Link to=".."> &larr; Go Back to Coins List</Link>
+      </BTN>
       {isLoadingInfo ? (
         <Loading />
       ) : (

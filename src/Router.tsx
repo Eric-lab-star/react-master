@@ -5,8 +5,12 @@ import Chart from "./routes/Chart";
 import Coin from "./routes/Coin";
 import Coins from "./routes/Coins";
 import Supply from "./routes/Supply";
-import { theme } from "./theme";
+import { theme, darkTheme } from "./theme";
 import { ReactQueryDevtools } from "react-query/devtools";
+import { useState } from "react";
+import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 // styled-components
 const ResetCss = createGlobalStyle`
     html, body, div, span, applet, object, iframe,
@@ -70,15 +74,39 @@ a{
 
 `;
 
+const BTN = styled.button`
+  color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.color};
+  border-style: none;
+  z-index: 1;
+  position: relative;
+  top: 120px;
+  left: -70px;
+  border-radius: 10px;
+  font-size: 18px;
+`;
+
 const queryClient = new QueryClient();
 
 function Router() {
+  const [isClicked, setClicked] = useState<boolean>(false);
+  const onClick = () => {
+    setClicked((pre) => (pre = !pre));
+  };
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={isClicked ? darkTheme : theme}>
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
         <BrowserRouter>
           <ResetCss />
+          <BTN onClick={onClick}>
+            {isClicked ? (
+              <FontAwesomeIcon icon={faMoon} />
+            ) : (
+              <FontAwesomeIcon icon={faSun} />
+            )}
+          </BTN>
           <Routes>
             <Route path="/" element={<Coins />} />
             <Route path=":coinId" element={<Coin />}>
