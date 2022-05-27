@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import Chart from "./routes/Chart";
@@ -10,7 +9,9 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { useRecoilValue } from "recoil";
+import { isDarkAtom } from "./routes/atoms";
 // styled-components
 const ResetCss = createGlobalStyle`
     html, body, div, span, applet, object, iframe,
@@ -86,36 +87,21 @@ const BTN = styled.button`
   font-size: 18px;
 `;
 
-const queryClient = new QueryClient();
-
 function Router() {
-  const [isClicked, setClicked] = useState<boolean>(false);
-  const onClick = () => {
-    setClicked((pre) => (pre = !pre));
-  };
-
+  const isDark = useRecoilValue(isDarkAtom);
   return (
-    <ThemeProvider theme={isClicked ? darkTheme : theme}>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <BrowserRouter>
-          <ResetCss />
-          <BTN onClick={onClick}>
-            {isClicked ? (
-              <FontAwesomeIcon icon={faMoon} />
-            ) : (
-              <FontAwesomeIcon icon={faSun} />
-            )}
-          </BTN>
-          <Routes>
-            <Route path="/" element={<Coins />} />
-            <Route path=":coinId" element={<Coin />}>
-              <Route path="supply" element={<Supply />} />
-              <Route path="chart" element={<Chart />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
+    <ThemeProvider theme={isDark ? darkTheme : theme}>
+      <ReactQueryDevtools initialIsOpen={false} />
+      <BrowserRouter>
+        <ResetCss />
+        <Routes>
+          <Route path="/" element={<Coins />} />
+          <Route path=":coinId" element={<Coin />}>
+            <Route path="supply" element={<Supply />} />
+            <Route path="chart" element={<Chart />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { Helmet } from "react-helmet";
 import { CoinsAPI } from "../api";
+import { NOTFOUND } from "dns";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "./atoms";
 
 //styled components
 const Container = styled.div`
@@ -79,6 +82,7 @@ interface CoinsI {
 
 // react component
 export default function Coins() {
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
   const { isLoading, data } = useQuery<CoinsI[]>("coinsData", CoinsAPI);
 
   return (
@@ -88,6 +92,7 @@ export default function Coins() {
       </Helmet>
       <Header>
         <Title>Coins</Title>
+        <button onClick={() => setDarkAtom((pre) => !pre)}>Theme</button>
       </Header>
 
       {isLoading ? (
