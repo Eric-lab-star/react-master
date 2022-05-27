@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { Helmet } from "react-helmet";
 import { CoinsAPI } from "../api";
-import { NOTFOUND } from "dns";
-import { useSetRecoilState } from "recoil";
-import { isDarkAtom } from "./atoms";
+
+import { useSetRecoilState, useRecoilState, useRecoilValue } from "recoil";
+import { fontSizeLabelState, fontSizeState, isDarkAtom } from "./atoms";
+import { prototype } from "apexcharts";
 
 //styled components
 const Container = styled.div`
@@ -16,10 +17,10 @@ const Container = styled.div`
 const Header = styled.div`
   margin: 10px 0px;
 `;
-const Title = styled.h1`
+const Title = styled.h1<{ fontSize: number }>`
   font-family: ohm-bold;
   font-weight: 700;
-  font-size: 60px;
+  font-size: ${(props) => `${props.fontSize}px`};
   text-align: center;
   margin: 20px;
   color: ${(props) => props.theme.accentColor};
@@ -79,10 +80,21 @@ interface CoinsI {
   is_active: boolean;
   type: string;
 }
-
+const FontBtn = () => {
+  const [fontSize, setFontSize] = useRecoilState(fontSizeState);
+  return (
+    <button
+      onClick={() => setFontSize((fontSize) => (fontSize = fontSize + 1))}
+    >
+      Size Up
+    </button>
+  );
+};
 // react component
 export default function Coins() {
   const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const [fontSize, useFontSize] = useRecoilState(fontSizeState);
+  const fontSizeLabel = useRecoilValue(fontSizeLabelState);
   const { isLoading, data } = useQuery<CoinsI[]>("coinsData", CoinsAPI);
 
   return (
@@ -91,9 +103,11 @@ export default function Coins() {
         <title>Coins</title>
       </Helmet>
       <Header>
-        <Title>Coins</Title>
+        <Title fontSize={fontSize}>Coins</Title>
         <button onClick={() => setDarkAtom((pre) => !pre)}>Theme</button>
       </Header>
+      <FontBtn />
+      <div>current font size: {fontSizeLabel}</div>
 
       {isLoading ? (
         <Loading />
