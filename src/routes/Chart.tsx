@@ -2,9 +2,11 @@ import { useQuery } from "react-query";
 import { CoinOHLCVAPI } from "../api";
 import { useCoinId } from "./Coin";
 import ApexChart from "react-apexcharts";
+import ApexCharts from "apexcharts";
 import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { Link } from "react-router-dom";
+import { exec } from "apexcharts";
 
 //interface
 interface IData {
@@ -58,10 +60,7 @@ const BTN = styled.button`
   border-radius: 5px;
   padding: 3px;
 `;
-interface IOHLData {
-  x: Date;
-  y: number[];
-}
+
 //component
 export default function Chart() {
   const { coinId } = useCoinId();
@@ -69,76 +68,43 @@ export default function Chart() {
     ["chart", coinId],
     () => CoinOHLCVAPI(coinId)
   );
+
   const [isClicked, setClicked] = useState(false);
-  const [line, setLine] = useState<number[]>();
-  const [candle, setCandle] = useState<IOHLData[]>();
+  const chartId = "hello";
+  const candleData = coinData?.map((v) => {
+    const singleObj = {} as { x: Date; y: number[] };
+    singleObj.y = [v.open, v.high, v.low, v.close];
+    singleObj.x = new Date(v.time_close);
+    return singleObj;
+  });
 
-  useEffect(() => {
-    const OHLCData = coinData?.map((v) => {
-      const singleObj = {} as { x: Date; y: number[] };
-      singleObj.y = [v.open, v.high, v.low, v.close];
-      singleObj.x = new Date(v.time_open);
-      return singleObj;
-    });
-
-    const highArray = coinData?.map((v) => Math.floor(v.high));
-    setLine(highArray);
-    setCandle(OHLCData);
-  }, [coinData]);
   const onClick = () => {
     setClicked((pre) => (pre = !pre));
+    if (isClicked) {
+      ApexCharts.exec(chartId, "updateSeries", [
+        { type: "candlestick", data: candleData },
+      ]);
+    } else {
+      ApexCharts.exec(chartId, "updateSeries", [{ type: "bar" }]);
+    }
   };
   return (
-    <ChartContianer>
+    <ChartContianer className={"Hello"}>
       {isLoading ? (
         <Loading />
       ) : (
         <div>
-          {
-            <ApexChart
-              width="500"
-              series={[{ data: candle as IOHLData[] }]}
-              type={"candlestick"}
-              options={{
-                chart: {
-                  toolbar: {
-                    show: true,
-                  },
-                },
-                xaxis: {
-                  categories: coinData?.map((v) => v.time_close),
-                  type: "datetime",
-                },
-                tooltip: {
-                  enabled: true,
-                  fillSeriesColor: false,
-                  x: {
-                    show: true,
-                  },
-                },
-                grid: {
-                  show: true,
-                },
-                colors: ["#a61111"],
-                plotOptions: {
-                  candlestick: {
-                    colors: {
-                      upward: "#3C90EB",
-                      downward: "#DF7D46",
-                    },
-                  },
-                },
-
-                stroke: {
-                  lineCap: "butt",
-                  curve: "smooth",
-                },
-              }}
-            />
-          }
+          <ApexChart
+            options={{
+              chart: { id: chartId },
+            }}
+            series={[{ type: "bar", data: candleData as [] }]}
+            width="500"
+            height={500}
+          />
         </div>
       )}
-      <BTN onClick={onClick}>Change Chart Style</BTN>
+      <button onClick={onClick}>click</button>
     </ChartContianer>
   );
 }
